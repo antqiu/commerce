@@ -1,0 +1,21 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h1>Showing Results for {{ category }}</h1>
+    {% for listing in listings %}
+    <div class="row">
+        <img class="col-6" src="{{ listing.image_url }}" alt="listing image" style="max-width: 350px; height: auto; ">
+        <div class="col-6">
+            <h3>{{ listing.title }}</h3>
+            <p>{{ listing.description }}</p>
+            <p>Starting Bid: <strong>{{ listing.starting_bid }} </strong></p>
+            <!-- <p>Current Bid: <strong>{{ listing.current_bid }} </strong></p> --> 
+            {% if listing.category %}
+                <p>Category: <strong>{{ listing.category }}</strong></p>
+            {% endif %}
+            <p>Posted by: <strong>{{ listing.user_id }}</strong></p>
+        </div>
+    </div>
+    <hr>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+    <br>
+    {% if user.is_authenticated %}
+        <div class="bg-light clearfix">
+            <span>Create your own listing</span>
+            <a href="{% url 'create' %}" class="btn btn-primary float-right">Create New Listing</a>
+        </div>
+    {% endif %}
+
+    {% for listing in listings %}
+    {% if listing.active %}
+    <div class="row">
+        <img class="col-6" src="{{ listing.image_url }}" alt="listing image" style="max-width: 350px; height: auto; ">
+        <div class="col-6">
+            <h3><a href="/{{ listing.id }}">{{ listing.title }}</a></h3>
+            <!-- i only did / [{ listing.id }] instead of [% url '' listing.id %] because the url can't add onto empty strings-->
+            <p>{{ listing.description }}</p>
+            <p>Starting Bid: <strong>${{ listing.starting_bid }} </strong></p>
+            <!-- <p>Current Bid: <strong>{{ listing.current_bid }} </strong></p> --> 
+            {% if listing.category %}
+                <p>Category: <strong>{{ listing.category }}</strong></p>
+            {% endif %}
+            <p>Posted by: <strong>{{ listing.user_id }}</strong></p>
+        </div>
+    </div>
+    <hr>
+    {% endif %}
+    {% endfor %}
+{% endblock %}

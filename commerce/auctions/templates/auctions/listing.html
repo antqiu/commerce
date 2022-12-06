@@ -1,0 +1,79 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Listing: {{ listing.title }}</h2>
+    <br>
+    <div class="row">
+        {% if listing.active %}
+        <form action="/watchlist" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ user.id }}">
+            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+            <input value="Watchlist" type="submit" class="btn btn-secondary">
+        </form>
+        {% endif %}
+        {% if user.id == listing.user_id.id %} 
+            {% if listing.active %}
+            <form action="/{{ listing.id }}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                <input type="submit" name="close" value="Close" class="btn btn-danger">
+            </form>
+            {% endif %} 
+        {% endif %} 
+    </div>
+    {% if message %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+    {% endif %}
+    <div>
+        <img src="{{ listing.image_url }}" alt="listing image" style="max-width: 350px; height: auto; ">
+        <p>{{ listing.description }}</p>
+        {% if listing.active %}
+            <div>
+                <h3>Current Bid: ${{ highest_bid }} </h3>
+                <!-- add an if statement here if the user id of the current bid is the same as user id. also add # of bids so far-->
+                <p>{{ bid_count }} bid(s) so far</p>
+                {% if highest_bid|stringformat:"s" == listing.starting_bid|stringformat:"s" %}
+                    <p>Be the first to bid!</p>
+                {% elif user.id == highest_bidder %}
+                    <p>You are the highest bidder!</p>
+                {% endif %}
+                    <p>Current highest bid by {{ highest_bidder }}</p>
+    
+                <form action="/{{ listing.id }}" method="POST">
+                    {% csrf_token %}
+                    <input type="text" name="bid" placeholder="Enter your bid">
+                    <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <input type="hidden" name="current_bid" value="{{ listing.current_bid }}">
+                    <input type="submit" value="Bid" class="btn btn-primary">
+                </form>
+            </div>
+            <br>
+            <h3>Details</h3>
+            {% if listing.category %}
+                <p>Category: {{ listing.category }}</p>
+            {% else %}
+                <p>Category: No category listed. </p>
+            {% endif %}
+            <p>Posted by: <strong>{{ listing.user_id }}</strong></p>
+        </div>
+        <div>
+            <h3>Comments</h3>
+            <form action="/{{ listing.id }}" method="POST">
+                {% csrf_token %}
+                <input type="text" name="comment" placeholder="Enter your comment">
+                <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <input type="submit" value="Comment" class="btn btn-primary">
+            {% for comment in comments reversed %}
+                <p>{{ comment.user_id }}: {{ comment.comment }}</p>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p><strong>{{ highest_bidder }} </strong>has won the bid!</p>
+    {% endif %}
+{% endblock %}
